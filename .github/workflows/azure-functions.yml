@@ -4,16 +4,14 @@ on:
   push:
     branches: [ main ]
     paths:
-      - "Functions/**"
-      - ".github/workflows/azure-functions.yml"
+      - "radarpipeline/**"
+      - "function_app.py"
+      - "host.json"
+      - "requirements.txt"
 
 permissions:
-  id-token: write       # REQUIRED for OIDC
+  id-token: write
   contents: read
-
-env:
-  AZURE_FUNCTIONAPP_NAME: my-functions-app
-  WORKING_DIRECTORY: Functions
 
 jobs:
   deploy:
@@ -32,15 +30,15 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
-        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: |
-          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+          pip install -r requirements.txt \
+            --target=".python_packages/lib/site-packages"
 
       - name: Deploy Azure Functions
         uses: Azure/functions-action@v1
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: ${{ env.WORKING_DIRECTORY }}
+          app-name: my-functions-app
+          package: .
