@@ -5,6 +5,11 @@ on:
     branches: [ main ]
     paths:
       - "Functions/**"
+      - ".github/workflows/azure-functions.yml"
+
+permissions:
+  id-token: write       # REQUIRED for OIDC
+  contents: read
 
 env:
   AZURE_FUNCTIONAPP_NAME: my-functions-app
