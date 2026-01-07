@@ -5,7 +5,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     response = {
         "status": "UP",
         "service": "azure-functions-demo",
-        "version": "1.0.0"
+        "version": "1.1.0"
     }
 
     return func.HttpResponse(
