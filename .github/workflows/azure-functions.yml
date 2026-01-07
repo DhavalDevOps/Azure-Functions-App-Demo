@@ -8,7 +8,7 @@ on:
       - main
 
 env:
-  AZURE_FUNCTIONAPP_NAME: my-functions-app
+  AZURE_FUNCTIONAPP_NAME: My-Functions
   WORKING_DIRECTORY: Functions
 
 jobs:
