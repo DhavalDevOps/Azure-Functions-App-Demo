@@ -8,6 +8,7 @@ on:
       - "function_app.py"
       - "host.json"
       - "requirements.txt"
+      - ".github/workflows/azure-functions.yml"
 
 permissions:
   id-token: write

@@ -1,0 +1,74 @@
+# GitHub Actions workflow name
+name: Deploy Azure Functions
+
+# Trigger the workflow on push events
+on:
+  push:
+    # Only run when pushing to the develop branch
+    branches: 
+      - dev-nen
+    # Only trigger when relevant files change
+    paths:
+      - "radarpipeline/**"
+      - "function_app.py"
+      - "host.json"
+      - ".github/workflows/dev-radarpipeline.yml"
+
+# Required permissions for Azure OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    # Use a self-hosted runner (must have Azure CLI installed)
+    runs-on: self-hosted
+
+    steps:
+      # Step 1: Checkout the source code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Authenticate with Azure using a service principal
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Step 3: Set up the required Python version for Azure Functions
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Step 4: Install Python dependencies into the Azure Functions expected folder
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt \
+            --target=".python_packages/lib/site-packages"
+
+      # Step 5: Deploy the Azure Function App
+      - name: Deploy Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          # Name of the Azure Function App
+          app-name: FormatAlert-func-dev
+          # Deploy the entire repository as the package
+          package: .
+
+      # Step 6: Verify that the Function App was deployed and is running
+      - name: Verify deployment
+        run: |
+          echo "Verifying Azure Function App deployment..."
+          az functionapp show \
+            --name FormatAlert-func-dev \
+            --resource-group <YOUR_RESOURCE_GROUP_NAME> \
+            --query "state" \
+            --output table
+
+      # Step 7: Logout from Azure (always runs, even if a previous step fails)
+      - name: Azure Logout
+        if: always()
+        run: |
+          az logout
+          echo "Logged out from Azure."
